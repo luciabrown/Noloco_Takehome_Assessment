@@ -1,0 +1,34 @@
+Test for greater than logic
+{
+  "where": {
+    "availableBikes": { "gt": 5 }
+  }
+}
+
+Testfor eq logic
+{
+  "where": {
+    "stationId": { "eq": 2 }
+  }
+}
+
+{
+  "where": {
+    "name": { "eq": "BOLTON STREET" }
+  }
+}
+
+Test for gt AND lt logic
+{
+  "where": {
+    "availableBikes": { "gt": 3 },
+    "availableBikeStands": { "lt": 20 }
+  }
+}
+
+Test for bool
+{
+  "where": {
+    "banking": { "eq": true }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "noloco",
+  "version": "1.0.0",
+  "description": "npm init -y   npm install express axios lodash body-parser   node index.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.12.1",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "nodemon": "^3.1.9"
+  },
+  "keywords": [],
+  "devDependencies": {}
+}
