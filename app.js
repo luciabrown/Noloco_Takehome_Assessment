@@ -106,5 +106,61 @@ app.post('/data', async (request, response) => {
   response.json(filteredData); //send filtered data as json response
 });
 
+// Another Endpoint for practice for technical interview - add pagination in /data
+app.post('/dataWithPagination', async (request,response)=>{
+  const data = await fetchFromURL(); //fetch data
+  const schema =  createSchema(data); //create schema
+  const normalData = data.map(row => normal(row, schema)); //normalise data
+  const filteredData = filter(normalData, request.body.where); //apply filtering
+  const {limit,offset} = request.body;  // return up to Limit rows
+  const start=offset||0;                // skip the first Offset rows that match
+  const end= limit?start+limit:filteredData.length; // define end as limit or start+limit
+  const paginated = filteredData.slice(start,end);  // take filters data as a slice of start and end
+  response.json(paginated);
+});
+
+// Another Endpoint for practice for technical interview - add basic sorting in /data
+app.post('/dataWithBasicSorting', async(request,response)=>{
+  const data = await fetchFromURL(); //fetch data
+  const schema =  createSchema(data); //create schema
+  const normalData = data.map(row => normal(row, schema)); //normalise data
+  const filteredData = filter(normalData, request.body.where); //apply filtering
+  const {orderBy, direction} = request.body;  // orderBy=fieldname to sort on and direction (ascending/descending)
+  let result = filteredData;
+  if(orderBy){      // if there is a field name to sort on, use it
+    result = _.orderBy(result,[orderBy],[direction || 'asc']) // if no direction, default to ascending
+  }
+  response.json(result);
+});
+
+// Another Endpoint for practice for technical interview - return number of rows
+app.get('/count', async (request,response)=>{
+  const data =  await fetchFromURL();
+  const schema = createSchema(data)
+  const normalData = data.map(row => normal(row, schema));
+  response.json(normalData.length);
+});
+
+// Another Endpoint for practice for technical interview - return number of rows while a WHERE clause is applied
+app.post('/countWithFilter', async(request,response)=>{
+  const data = await fetchFromURL();
+  const schema = createSchema(data);
+  const normalData = data.map(row=>normal(row,schema));
+  const filteredData = filter(normalData, request.body.where);
+  response.json(filteredData.length);
+});
+
+// Another Endpoint for practice for technical interview - return unique values for a given field
+app.get('/distinct/:field', async(request,response)=>{
+  const data = await fetchFromURL();
+  const schema = createSchema(data);
+  const normalData = data.map(row=>normal(row,schema));
+
+  const fieldName = request.params.field;
+  const values = normalData.map(row=>row[fieldName]).filter(v=>v!==null && v!==undefined &&v!=='');
+  const unique = [...new Set(values)];
+  response.json(unique);
+});
+
 // Call app
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
