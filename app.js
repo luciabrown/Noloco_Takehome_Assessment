@@ -106,6 +106,42 @@ app.post('/data', async (request, response) => {
   response.json(filteredData); //send filtered data as json response
 });
 
+// Another functionality  for practice for technical interview - add caching when fetching from URL
+const CACHE_TTL = 6000;
+let cache = {data:null, timestamp:0};
+
+async function fetchFromURLWithCaching(){
+  const now = Date.now();
+  if(cache.data && (now-cache.timestamp < CACHE_TTL)){
+    return cache.data
+  }
+  const response = await axios.get(DATA_URL); //get data from the URL
+  cache = {data: response.data, timestamp:now};
+  return cache.data;
+}
+
+// Another functionality&endpoint for practice for technical interview - add caching for previously asked queries
+const QUERY_TTL = 6000;
+let queryCache = {};
+
+function getCachedQuery(query){
+  return JSON.stringify(query||{});
+}
+app.post('/dataWithCachedQueries', async(request,response)=>{
+  const queryKey = getCachedQuery(request.body.where);
+  const now = Date.now();
+
+  if(queryCache[queryKey] && (now - queryCache[queryKey].timestamp < QUERY_TTL)){
+    return response.json(queryCache[queryKey].data);
+  }
+  const data = await fetchFromURLWithCaching();
+  const schema =  createSchema(data); //create schema
+  const normalData = data.map(row => normal(row, schema)); //normalise data
+  const filteredData = filter(normalData, request.body.where); //apply filtering
+  queryCache[queryKey]={data:filteredData,timestamp:now};
+  response.json(queryCache[queryKey].data)
+});
+
 // Another Endpoint for practice for technical interview - add pagination in /data
 app.post('/dataWithPagination', async (request,response)=>{
   const data = await fetchFromURL(); //fetch data
